@@ -1,0 +1,36 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# === Virtual environments ===
+env/
+venv/
+ENV/
+.venv/
+.ENV/
+
+# === Environment variables ===
+.env
+
+# === Dependencies ===
+# requirements.txt should be committed (it's useful!)
+# But if you have large dependency folders (like site-packages), ignore them
+*.egg-info/
+*.egg
+dist/
+build/
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+
+# === OS-specific files ===
+.DS_Store
+Thumbs.db
+
+# === Logs & misc ===
+*.log
+*.tmp

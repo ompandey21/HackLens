@@ -29,33 +29,6 @@ import HowItWorksSection from '../../components/HomeComponents/HowItWorksSection
 import CTASection from '../../components/HomeComponents/CTASection';
 import StatsSection from '../../components/HomeComponents/StatsSection';
 import Footer from '../../components/HomeComponents/Footer';
-
-
-
-// Enhanced Navbar Component
-
-
-// Visual Card Component
-
-
-// Enhanced Hero Section Component
-
-
-// Stats Item Component
-
-// Feature Card Component
-
-
-// Enhanced Features Section Component
-
-// Step Item Component
-
-// Enhanced CTA Section Component  
-
-
-// Footer Link Component
-
-// Scroll Progress Indicator Component
 const ScrollProgressIndicator = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
