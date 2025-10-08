@@ -8,4 +8,4 @@ app.include_router(users.router, prefix="/users", tags=["Users"])
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to HackLens!"}
+    return {"message": "Welcome to Hack Lens!"}
