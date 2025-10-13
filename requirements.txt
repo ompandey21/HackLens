@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-pptx
+lightgbm
+sentence-transformers
+textstat
+scikit-learn
+numpy
+pandas
+joblib

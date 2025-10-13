@@ -1,0 +1,23 @@
+# Virtual environments
+.venv/
+hacklens_env/
+venv/
+
+# Already existing repo folder
+HackLens/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# IDE/System files
+.vscode/
+.idea/
+.DS_Store
+.env
