@@ -3,8 +3,6 @@
 hacklens_env/
 venv/
 
-# Already existing repo folder
-HackLens/
 
 # Python cache
 __pycache__/
