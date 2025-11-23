@@ -1,0 +1,271 @@
+/* ===========================
+   PARTICIPANT DASHBOARD
+   =========================== */
+
+.participant-dashboard {
+  min-height: 100vh;
+  padding: 7rem 2rem 3rem;
+  background: radial-gradient(circle at 10% 20%, #0f1f3a 0%, #1e3a5f 100%);
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ---------------------------
+   USER INFO CARD
+   --------------------------- */
+.user-info-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+}
+
+.user-info-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.25);
+}
+
+.user-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-details h2 {
+  font-size: 1.4rem;
+  margin: 0;
+  color: #fff;
+}
+
+.user-details p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.role-tag {
+  display: inline-block;
+  background: linear-gradient(90deg, #06b6d4, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+}
+
+.join-date {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ---------------------------
+   HACKATHONS LIST
+   --------------------------- */
+.hackathons-list {
+  width: 100%;
+  max-width: 1000px;
+}
+
+.hackathons-list h3 {
+  color: #38bdf8;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.empty-text {
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 2rem;
+}
+
+/* ---------------------------
+   HACKATHON CARDS
+   --------------------------- */
+.hackathon-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.hackathon-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.hackathon-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.25);
+}
+
+/* Hackathon Info */
+.hackathon-info h4 {
+  font-size: 1.1rem;
+  margin: 0 0 0.3rem;
+  color: #fff;
+}
+
+.hackathon-info p {
+  margin: 0.25rem 0;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.hack-desc {
+  font-size: 0.85rem;
+  color: #a3b3c5;
+  margin-top: 0.5rem;
+}
+
+.hack-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.status-tag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-tag.active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.status-tag.ended {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* ---------------------------
+   CARD FOOTER (SUBMISSION)
+   --------------------------- */
+.hack-footer {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.8rem;
+}
+
+.eval-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.eval-status .eval-icon {
+  color: #22c55e;
+}
+
+.eval-status .pending-icon {
+  color: #facc15;
+}
+
+.btn-submit-project {
+  background: linear-gradient(90deg, #06b6d4, #38bdf8);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-submit-project:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+}
+
+/* ---------------------------
+   RESPONSIVE
+   --------------------------- */
+@media (max-width: 768px) {
+  .participant-dashboard {
+    padding: 6rem 1.2rem;
+  }
+
+  .user-info-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .hackathon-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-submit-project {
+    width: 100%;
+    justify-content: center;
+  }
+}
+.btn-submit-project {
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s ease;
+  font-weight: 500;
+}
+
+.btn-submit-project:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+/* ✅ Green View Submission button */
+.btn-view-submission {
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+}
+
+.btn-view-submission:hover {
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+/* Submission status color states */
+.eval-status.submitted span {
+  color: #22c55e;
+}
+
+.eval-status.pending span {
+  color: #eab308;
+}
+

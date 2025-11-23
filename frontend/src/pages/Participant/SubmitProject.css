@@ -1,0 +1,104 @@
+.submit-container {
+  max-width: 700px;
+  margin: 8rem auto 4rem auto; /* navbar offset */
+  padding: 2.5rem;
+  background: rgba(15, 31, 58, 0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  color: #e2e8f0;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.submit-container h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #06b6d4, #38bdf8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 2rem;
+}
+
+.submit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  align-items: stretch;
+}
+
+.submit-form label {
+  font-weight: 600;
+  color: #cbd5e1;
+  text-align: left;
+  margin-bottom: 0.3rem;
+}
+
+.submit-form input[type="file"],
+.submit-form input[type="url"] {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #f1f5f9;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.submit-form input[type="file"]:hover,
+.submit-form input[type="url"]:focus {
+  border-color: #38bdf8;
+}
+
+.submit-btn {
+  margin-top: 1rem;
+  padding: 0.9rem;
+  background: linear-gradient(90deg, #06b6d4, #38bdf8);
+  border: none;
+  border-radius: 12px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  box-shadow: 0 5px 20px rgba(14, 165, 233, 0.3);
+}
+
+.submit-btn:hover {
+  box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+  transform: translateY(-2px);
+}
+
+.status-msg {
+  margin-top: 1.2rem;
+  font-weight: 500;
+  color: #38bdf8;
+}
+
+.status-msg.error {
+  color: #ef4444;
+}
+
+.spin {
+  animation: spin 1.2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .submit-container {
+    width: 90%;
+    padding: 1.8rem;
+  }
+
+  .submit-form input {
+    font-size: 0.95rem;
+  }
+}

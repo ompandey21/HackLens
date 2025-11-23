@@ -1,0 +1,54 @@
+import React from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, ShieldCheck, Cpu, Code2, Rocket, Share2 } from "lucide-react";
+
+const typeIcon = (type) => {
+  if (type === "ml_hackathon") return <Cpu size={18} />;
+  if (type === "codeathon") return <Code2 size={18} />;
+  return <Rocket size={18} />;
+};
+
+const HeroBanner = ({ name, type, active, createdBy, createdAt, onBack, onShare }) => {
+  const created = createdAt ? new Date(createdAt) : null;
+
+  return (
+    <motion.div
+      className="hero-banner"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+    >
+      <div className="hero-bg-glow" />
+      <div className="hero-top">
+        <button className="btn ghost round" onClick={onBack}>
+          <ArrowLeft size={16} /> Back
+        </button>
+        <button className="btn ghost" onClick={onShare}>
+          <Share2 size={16} /> Share
+        </button>
+      </div>
+
+      <div className="hero-content">
+        <div className="badges" style={{ marginBottom: "0.6rem" }}>
+          <span className="badge cyan">{typeIcon(type)} {type.replace("_", " ")}</span>
+          <span className={`badge ${active ? "green" : "gray"}`}>
+            <ShieldCheck size={16} /> {active ? "Active" : "Ended"}
+          </span>
+        </div>
+
+        <h1 className="hero-title">
+          <span className="grad-cyan">{name}</span>
+        </h1>
+
+        <div className="hero-sub">
+          Created by <b>{createdBy}</b>
+          {created ? ` • ${created.toLocaleDateString()}` : ""}
+        </div>
+
+        <div className="hero-divider" />
+      </div>
+    </motion.div>
+  );
+};
+
+export default HeroBanner;

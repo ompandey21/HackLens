@@ -4,11 +4,11 @@ import {
 
   ArrowRight
 } from 'lucide-react';
-const CTASection = () => {
-  const handleGetStarted = () => {
-    console.log('Routing to login page...');
-  };
+import { useNavigate } from 'react-router-dom';
 
+const CTASection = () => {
+
+  const navigate = useNavigate();
   return (
     <section className="cta-section">
       <div className="section-container">
@@ -39,7 +39,7 @@ const CTASection = () => {
           </motion.p>
           <motion.button 
             className="cta-button-large"
-            onClick={handleGetStarted}
+            onClick={() => {navigate('/hackathons')}}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
@@ -51,7 +51,7 @@ const CTASection = () => {
             }}
             whileTap={{ scale: 0.98 }}
           >
-            Start Free Trial
+            Explore Now
             <ArrowRight size={20} />
           </motion.button>
         </motion.div>

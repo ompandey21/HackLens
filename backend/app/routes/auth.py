@@ -17,6 +17,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    print("SECRET_KEY:", SECRET_KEY[:10])
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -41,6 +43,24 @@ def RoleChecker(allowed_roles: List[UserRole]):
             )
         return current_user
     return check_roles
+
+# Admin User : 
+# {
+#   "name": "Admin Om",
+#   "username": "admin_om",
+#   "email": "admin@hacklens.com",
+#   "password": "AdminPass123",
+#   "role": "admin"
+# }
+
+# Participant:
+# {
+#   "name": "Test Participant",
+#   "username": "participant_om",
+#   "email": "participant@test.com",
+#   "password": "test123456",
+#   "role": "participant"
+# }
 
 @router.post("/signup", response_model=User)
 async def signup(user_data: UserCreate):
@@ -82,3 +102,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
     
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me", response_model=User)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return current_user

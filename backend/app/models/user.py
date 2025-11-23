@@ -19,7 +19,7 @@ class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: constr(min_length=8, max_length=72)
-    role: UserRole = UserRole.PARTICIPANT
+    role: UserRole 
 
 class User(BaseModel):
     # Use the new PyObjectId type for the id field

@@ -182,8 +182,7 @@ const Home = () => {
             <HowItWorksSection />
             <CTASection />
           </main>
-          <Footer />
-          <FloatingActionButton />
+          
         </>
       )}
     </div>

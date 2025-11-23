@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from app.routes import auth, users
+from app.routes import auth, users, judge, participant
 from app.routes import model_evaluator
+from app.routes import hackathon
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -15,8 +16,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(hackathon.router, prefix="/hackathon", tags=["Hackathon"])
+app.include_router(judge.router, prefix="/judge", tags=["Judge"])
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(participant.router, prefix="/participant", tags=["Participant"])
 app.include_router(model_evaluator.router, prefix="/model_evaluator", tags=["Model Evaluator"])
 
 @app.get("/")
