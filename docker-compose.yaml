@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: hacklens-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+
+  ml_executor_builder:
+    build:
+      context: ./backend
+      dockerfile: ml-executor.Dockerfile # Use the new file
+    image: hacklens-ml-env:latest # Tag the image so the code_executor can reference it
+    container_name: hacklens-ml-image-builder
+    # This service is just to ensure the image is built and tagged locally
+    command: ["echo", "ML Executor Image Built Successfully"]
+
+  frontend:
+    build: ./frontend
+    container_name: hacklens-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    restart: always
