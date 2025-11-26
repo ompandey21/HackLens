@@ -334,8 +334,8 @@ const HackLensAuth = () => {
             throw new Error(errorMessage);
           }
 
-          alert("✅ Account created successfully! Please verify your email.");
-          navigate("/login");
+  
+          navigate("/auth");
         } catch (error) {
           console.error("Signup error:", error);
           setErrors({

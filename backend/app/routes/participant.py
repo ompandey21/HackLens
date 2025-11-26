@@ -80,13 +80,9 @@ async def submit_project(
     hackathon_id: str,
     hackathon_type: str = Form(...),
     github_url: str = Form(None),
-    model_file: UploadFile = File(None),
-    code_file: UploadFile = File(None),
-    dockerfile: UploadFile = File(None),
+    code_file: UploadFile | None = File(None),
     current_user: User = Depends(get_current_user)
 ):
-    """Handles dynamic hackathon submissions based on type."""
-
     if current_user.role != UserRole.PARTICIPANT:
         raise HTTPException(status_code=403, detail="Only participants can submit.")
 
@@ -97,7 +93,7 @@ async def submit_project(
     if not hackathon:
         raise HTTPException(status_code=404, detail="Hackathon not found")
 
-    # Avoid duplicate submissions
+    # prevent duplicate
     existing = await submissions_collection.find_one({
         "hackathon_id": hackathon_id,
         "participant": current_user.username
@@ -105,22 +101,41 @@ async def submit_project(
     if existing:
         raise HTTPException(status_code=400, detail="You already submitted for this hackathon")
 
+    # --- Validate according to hackathon type ---
     filename = None
+    save_path = None
 
-    # Handle file saving
-    if model_file:
-        filename = f"{current_user.username}_{model_file.filename}"
-        with open(os.path.join(UPLOAD_DIR, filename), "wb") as f:
+    if hackathon_type == "ml_hackathon":
+        if not model_file:
+            raise HTTPException(status_code=400, detail="Model file required for ML hackathon")
+        safe_name = f"{current_user.username}_{model_file.filename.replace('..','_')}"
+        save_path = os.path.join(UPLOAD_DIR, safe_name)
+        filename = safe_name
+        with open(save_path, "wb") as f:
             f.write(await model_file.read())
-    elif code_file:
-        filename = f"{current_user.username}_{code_file.filename}"
-        with open(os.path.join(UPLOAD_DIR, filename), "wb") as f:
+
+    elif hackathon_type == "codeathon":
+        if not code_file:
+            raise HTTPException(status_code=400, detail="Source code file required for Codeathon")
+        safe_name = f"{current_user.username}_{code_file.filename.replace('..','_')}"
+        save_path = os.path.join(UPLOAD_DIR, safe_name)
+        filename = safe_name
+        with open(save_path, "wb") as f:
             f.write(await code_file.read())
-    elif dockerfile:
-        filename = f"{current_user.username}_Dockerfile"
-        with open(os.path.join(UPLOAD_DIR, filename), "wb") as f:
+
+    elif hackathon_type == "docker_hackathon":
+        if not dockerfile:
+            raise HTTPException(status_code=400, detail="Dockerfile required for Docker hackathon")
+        safe_name = f"{current_user.username}_Dockerfile"
+        save_path = os.path.join(UPLOAD_DIR, safe_name)
+        filename = safe_name
+        with open(save_path, "wb") as f:
             f.write(await dockerfile.read())
 
+    else:
+        raise HTTPException(status_code=400, detail="Invalid hackathon type")
+
+    # insert in DB
     submission = {
         "hackathon_id": hackathon_id,
         "participant": current_user.username,
@@ -130,7 +145,7 @@ async def submit_project(
         "submitted_at": datetime.utcnow(),
         "status": "submitted",
         "evaluation_result": None,
-        "judge_assigned": None
+        "assigned_judge": None
     }
 
     await submissions_collection.insert_one(submission)

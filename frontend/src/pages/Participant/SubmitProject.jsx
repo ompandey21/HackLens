@@ -66,7 +66,7 @@ const SubmitProject = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMsg(res.data.message);
-      setTimeout(() => navigate("/participant-dashboard"), 2000);
+      setTimeout(() => navigate("/dashboard/participant"), 2000);
     } catch (err) {
       console.error(err);
       setMsg(err.response?.data?.detail || "Submission failed.");

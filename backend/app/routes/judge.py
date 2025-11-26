@@ -8,15 +8,63 @@ from app.models.user import UserRole, User
 from bson import ObjectId
 import os
 from fastapi import Path
-from app.routes.model_evaluator import run_model_evaluation, evaluate_model, predict_pitch, execute
+from app.routes.model_evaluator import run_model_evaluation, evaluate_model, predict_pitch, execute, CodeRequest
 
+from fastapi.responses import JSONResponse
+from typing import Optional, Dict, Any
+from bson import ObjectId
+from pathlib import Path
+import aiofiles
+import asyncio
+import os
+import random
 import numpy as np
+import random
   
 
 router = APIRouter()
 
+EXT_TO_LANGUAGE = {
+    "py": "python",
+    "java": "java",
+    "cpp": "cpp",
+    "cc": "cpp",
+    "cxx": "cpp",
+    "c": "c",
+    # add more as needed
+}
+
+TEXT_FILE_EXTS = {".py", ".java", ".cpp", ".c", ".txt", ".ipynb"}  # allowed for preview
+UPLOADS_DIR = Path("uploads")  # path to uploads directory
+
+def extract_extension(filename: str) -> Optional[str]:
+    """Return extension (without dot) or None if none."""
+    if not filename or "." not in filename:
+        return None
+    return filename.rsplit(".", 1)[-1].lower()
+
+def is_dockerfile(filename: str) -> bool:
+    """Detect 'Dockerfile' (no extension) or named Dockerfile.* variants."""
+    base = Path(filename).name
+    if base == "Dockerfile":
+        return True
+    # e.g., Dockerfile.prod
+    if base.startswith("Dockerfile."):
+        return True
+    return False
+
+async def read_text_file_safe(path: Path) -> str:
+    """Read a text file asynchronously and return contents. Raises on IO error."""
+    async with aiofiles.open(path, mode="r", encoding="utf-8", errors="ignore") as f:
+        return await f.read()
+    
+
+
 @router.post("/assign_judge/{submission_id}")
-async def assign_judge(submission_id: str, judge_username: str):
+async def assign_judge(submission_id: str, judge_username: str, current_user: User = Depends(get_current_user)):
+    current_user = get_current_user()
+    if(current_user.role != UserRole.JUDGE and current_user.role != UserRole.ADMIN):
+        raise HTTPException(status_code=403, detail="Access denied")
     result = await submissions_collection.update_one(
         {"_id": ObjectId(submission_id)},
         {"$set": {"assigned_judge": judge_username}}
@@ -51,17 +99,14 @@ async def get_assigned_hackathons(
         print("❌ Error fetching assigned submissions:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
-import traceback
 
 @router.get("/submissions")
 async def get_all_submissions(current_user: User = Depends(get_current_user)):
-    if current_user.role != UserRole.ADMIN:
+    if current_user.role != UserRole.JUDGE:
         raise HTTPException(status_code=403, detail="Access denied")
     subs = await submissions_collection.find().to_list(None)
     return subs
 
-
-from app.routes.model_evaluator import run_model_evaluation
 
 @router.post("/evaluate/{submission_id}")
 async def evaluate_submission(submission_id: str, current_user: User = Depends(get_current_user)):
@@ -78,19 +123,39 @@ async def evaluate_submission(submission_id: str, current_user: User = Depends(g
 
     hack_type = submission["hackathon_type"]
 
-    # ---- Step 1: Dummy metrics ----
-    import random, asyncio
-    await asyncio.sleep(0.3)
+    extension_to_language = {
+    "py": "python",
+    "java": "java",
+    "cpp": "cpp"
+    }
+
+    # ---- Step 1: Evaluate submission ----
+    submitted_filename = submission.get("submission_filename")
+    result = None
+    file_path = f"uploads/{submitted_filename}" if submitted_filename else None
 
     if hack_type == "ml_hackathon":
-        evaluate_model(submission.get("submission_filename"))
+        with open(file_path, "rb") as f:
+            upload_like = UploadFile(filename=submitted_filename, file=f)
+            result = await evaluate_model(file=upload_like)
 
     elif hack_type == "codeathon":
-        file = submission.get("submission_filename")
+        # For Code: open text, read string, pass to execute()
+        extension = submitted_filename.rsplit(".", 1)[-1].lower()
+        lang = extension_to_language.get(extension)
+
+        if not lang:
+            raise HTTPException(status_code=400, detail="Unsupported code file type")
+
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            code_text = f.read()
+
+        new_req = CodeRequest(language=lang, code=code_text)
+        result = execute(new_req)
         
 
     else:
-        metrics = {
+        result = {
             "docker_valid": bool(random.choice([True, False])),
             "deployment_ready": bool(random.choice([True, False])),
             "final_score": round(random.uniform(0.6, 0.95), 2)
@@ -108,18 +173,10 @@ async def evaluate_submission(submission_id: str, current_user: User = Depends(g
             # If file is text-based (py, cpp, java, txt, Dockerfile, ipynb)
             if any(file_path.endswith(ext) for ext in [".py", ".cpp", ".java", ".txt", "Dockerfile"]):
                 with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
-                    code_preview = f.read()[:1500]
+                    code_preview = f.read()
 
-            # If ML model (.onnx), try to find corresponding script
-            elif file_path.endswith(".onnx"): 
-                # Try to find a script with same prefix
-                base = filename.split(".")[0] 
-                for ext in [".py", ".ipynb"]: 
-                    alt = f"uploads/{base}{ext}"
-                    if os.path.exists(alt):
-                        with open(alt, "r", encoding="utf-8", errors="ignore") as f:
-                            code_preview = f.read()[:1500]
-                            break
+            else:
+                raise HTTPException(status_code=400, detail="Unsupported file type for code preview.")
 
         except Exception as e:
             code_preview = f"(Error reading code: {str(e)})"
@@ -129,24 +186,24 @@ async def evaluate_submission(submission_id: str, current_user: User = Depends(g
     import os, google.generativeai as genai
     
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel("gemini-pro")
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     prompt = f"""
-You are an evaluator for a hackathon platform.
+    You are an evaluator for a hackathon platform.
 
-Hackathon Type: {hack_type}
-Metrics: {metrics}
-Participant Username: {submission['participant']}
-Submitted Code Snippet: {code_preview}
+    Hackathon Type: {hack_type}
+    Reasult metrics: {result}
+    Participant Username: {submission['participant']}
+    Submitted Code Snippet: {code_preview}
 
-Write a clear human-friendly evaluation summary. Use this format:
+    Write a clear human-friendly evaluation summary. Use this format:
 
-1. Overall Summary (2–3 sentences)
-2. Interpretation of Metrics
-3. Strengths (bullets)
-4. Weaknesses (bullets)
-5. Suggestions (bullets)
-"""
+    1. Overall Summary (2–3 sentences)
+    2. Interpretation of Metrics
+    3. Strengths (bullets)
+    4. Weaknesses (bullets)
+    5. Suggestions (bullets)
+    """
 
     try:
         ai_res = model.generate_content(prompt)
@@ -159,12 +216,16 @@ Write a clear human-friendly evaluation summary. Use this format:
         {"_id": ObjectId(submission_id)},
         {"$set": {
             "status": "evaluated",
-            "evaluation_result": metrics,
+            "evaluation_result": result,
             "evaluation_result_text": explanation
         }}
     )
 
-    return {"evaluated": True}
+    # return {"evaluated": True}
+    return {
+        "metrics": result,
+        "explanation": explanation
+    }
 
 @router.get("/get_result/{submission_id}")
 async def get_result(submission_id: str, current_user: User = Depends(get_current_user)):
